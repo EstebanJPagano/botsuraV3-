@@ -44,11 +44,18 @@ int LAZER = 48;
 #define MOTOR_2 1
 
 short usSpeed = 255;  //default motor speed
-short speedMax = 255;  
-short speed_Med = 160;  
-short speed_Min = 70;  
+short speedMax = 255;
+short speed_Med = 160;
+short speed_Min = 70;
 
 unsigned short usMotor_Status = BRAKE;
+
+// delay
+bool bucle_activado = false; // Estado de un bucle (activado o desactivado)
+unsigned long actual = 0;  //almacena un número entero muy largo
+unsigned long anterior = 0;
+int timedelay = 100;
+
 
 void setup() {
 
@@ -62,8 +69,8 @@ void setup() {
   pinMode(PinLED4, OUTPUT);
   pinMode(PinLED5, OUTPUT);
   pinMode(PinLED6, OUTPUT);
-  
-  // LAZER  
+
+  // LAZER
   pinMode(LAZER, OUTPUT);
 
   // Sensor IR obstaculos
@@ -86,100 +93,126 @@ void setup() {
 
   digitalWrite(EN_PIN_1, HIGH);
   digitalWrite(EN_PIN_2, HIGH);
+  anterior = millis();
 
 }
 
 void loop() {
-  
-  //------------Bluetooth
-  if (miBT.available()) {    // si hay informacion disponible desde modulo
-    databt = miBT.read();   // almacena en databt el caracter recibido desde modulo
-  Serial.println(usSpeed);
+  // obtener el valor en el momento que arranca el código
+  actual = millis();
+  if (actual - anterior > timedelay)  {
+    anterior = millis(); // o escribir: anterior + 1000;
+    if (bucle_activado) {
+      //------------Bluetooth
+      if (miBT.available()) {    // si hay informacion disponible desde modulo
+        databt = miBT.read();   // almacena en databt el caracter recibido desde modulo
+        Serial.println(usSpeed);
 
-  String mensaje = "Botsura   conectado"; // Mensaje a enviar
-  miBT.println(mensaje); // Envía el mensaje por Bluetooth
-  //delay(100); // Espera un segundo antes de enviar el siguiente mensaje
+        String mensaje = "Botsura   conectado"; // Mensaje a enviar
+        miBT.println(mensaje); // Envía el mensaje por Bluetooth
+        //delay(100); // Espera un segundo antes de enviar el siguiente mensaje
 
 
-    if (databt == 0) {
-      Stop();
-      goLucesOff();
-    }
-    else if (databt == 1) {
-      Forward();
-      goLucesAdelante();
-    }
-    else if (databt == 2) {
-      Reverse();
-      goLucesReversa();
-    }
-    else if (databt == 3) {
-      Left();
-      goLucesIzquierda();
-    }
-    else if (databt == 4) {
-      Right();
-      goLucesDerecha();
-    }
-    else if (databt == 5) {
-      derForward();
-    }
-    else if (databt == 6) {
-      derReverse();
-    }
-    else if (databt == 7) {
-      izqForward();
-    }
-    else if (databt == 8) {
-      izqReverse();
-    }
-    else if (databt == 9) {
-      danceDance();
-    }
-    else if (databt == 15) {
-      goLuces();
-    }
-    else if (databt == 14) {
-      goLucesOff();
-    }
-    else if (databt == 15) {
-      led_blink();
-    }
-    else if (databt == 16) {
-      goLucesColor();
-    }
-    else if (databt == 17) {
-      goLucesOffColor();
-    }
-    else if (databt == 10) {
-      digitalWrite(LAZER, HIGH);
-    }
-    else if (databt == 255) {
-      setSpeed(255);
-    }
-    else if (databt == 160) {
-      setSpeed(160);
-    }
-    else if (databt == 90) {
-      setSpeed(90);
-    }
-    else {
-      Stop();
-      goLucesOff();
+        if (databt == 0) {
+          bucle_activado = false;
+          Stop();
+          goLucesOff();
+
+        }
+        else if (databt == 1) {
+          bucle_activado = false;
+          Forward();
+          goLucesAdelante();
+        }
+        else if (databt == 2) {
+          bucle_activado = false;
+          Reverse();
+          goLucesReversa();
+        }
+        else if (databt == 3) {
+          bucle_activado = false;
+          Left();
+          goLucesIzquierda();
+        }
+        else if (databt == 4) {
+          bucle_activado = false;
+          Right();
+          goLucesDerecha();
+        }
+        else if (databt == 5) {
+          bucle_activado = false;
+          derForward();
+        }
+        else if (databt == 6) {
+          bucle_activado = false;
+          derReverse();
+        }
+        else if (databt == 7) {
+          bucle_activado = false;
+          izqForward();
+        }
+        else if (databt == 8) {
+          bucle_activado = false;
+          izqReverse();
+        }
+        else if (databt == 9) {
+          bucle_activado = false;
+          danceDance();
+        }
+        else if (databt == 15) {
+          bucle_activado = false;
+          goLuces();
+        }
+        else if (databt == 14) {
+          bucle_activado = false;
+          goLucesOff();
+        }
+        else if (databt == 15) {
+          bucle_activado = false;
+          led_blink();
+        }
+        else if (databt == 16) {
+          bucle_activado = false;
+          goLucesColor();
+        }
+        else if (databt == 17) {
+          bucle_activado = false;
+          goLucesOffColor();
+        }
+        else if (databt == 10) {
+          bucle_activado = false;
+          digitalWrite(LAZER, HIGH);
+        }
+        else if (databt == 255) {
+          bucle_activado = false;
+          setSpeed(255);
+        }
+        else if (databt == 160) {
+          bucle_activado = false;
+          setSpeed(160);
+        }
+        else if (databt == 90) {
+          bucle_activado = false;
+          setSpeed(90);
+        }
+        else {
+          bucle_activado = false;
+          Stop();
+          goLucesOff();
+        }
+      }
+      bucle_activado = true;
     }
   }
-  delay(50);
 
-    //  Serial.println("usSpeed");
-    // Serial.println(usSpeed);  
 
 }
 
 int setSpeed(int speed) {
-      usSpeed = usSpeed;
+  usSpeed = usSpeed;
   Serial.println(usSpeed);
 
-}  
+}
 
 void derForward() {
   Serial.println("derForward");
@@ -232,7 +265,7 @@ void Right() {
 
 
 void Stop() {
-  //Serial.println("Stop");
+  Serial.println("Stop");
   usMotor_Status = BRAKE;
   motorGo(MOTOR_1, usMotor_Status, 0);
   motorGo(MOTOR_2, usMotor_Status, 0);
@@ -306,12 +339,12 @@ void led_blink() {
 
 
 void goLuces() {
-   digitalWrite(PinLED1, HIGH); // adelante derecha
-   digitalWrite(PinLED2, HIGH); 
-   digitalWrite(PinLED3, HIGH); //  atras
-   digitalWrite(PinLED4, HIGH); // sirena
-   digitalWrite(PinLED5, HIGH); // naranja
-   digitalWrite(PinLED6, HIGH);  //adelante izq
+  digitalWrite(PinLED1, HIGH); // adelante derecha
+  digitalWrite(PinLED2, HIGH);
+  digitalWrite(PinLED3, HIGH); //  atras
+  digitalWrite(PinLED4, HIGH); // sirena
+  digitalWrite(PinLED5, HIGH); // naranja
+  digitalWrite(PinLED6, HIGH);  //adelante izq
 }
 
 
@@ -334,7 +367,7 @@ void goLucesDerecha() {
 }
 
 void goLucesOff() {
-   digitalWrite(LAZER, LOW);
+  digitalWrite(LAZER, LOW);
   digitalWrite(PinLED1, LOW);
   digitalWrite(PinLED2, LOW);
   digitalWrite(PinLED3, LOW);
