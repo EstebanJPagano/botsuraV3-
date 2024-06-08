@@ -50,12 +50,6 @@ short speed_Min = 70;
 
 unsigned short usMotor_Status = BRAKE;
 
-// delay
-bool bucle_activado = false; // Estado de un bucle (activado o desactivado)
-unsigned long actual = 0;  //almacena un número entero muy largo
-unsigned long anterior = 0;
-int timedelay = 100;
-
 
 void setup() {
 
@@ -93,119 +87,89 @@ void setup() {
 
   digitalWrite(EN_PIN_1, HIGH);
   digitalWrite(EN_PIN_2, HIGH);
-  anterior = millis();
 
 }
 
 void loop() {
   // obtener el valor en el momento que arranca el código
-  actual = millis();
-  if (actual - anterior > timedelay)  {
-    anterior = millis(); // o escribir: anterior + 1000;
-    if (bucle_activado) {
-      //------------Bluetooth
-      if (miBT.available()) {    // si hay informacion disponible desde modulo
-        databt = miBT.read();   // almacena en databt el caracter recibido desde modulo
-        Serial.println(usSpeed);
+  //------------Bluetooth
 
-        String mensaje = "Botsura   conectado"; // Mensaje a enviar
-        miBT.println(mensaje); // Envía el mensaje por Bluetooth
-        //delay(100); // Espera un segundo antes de enviar el siguiente mensaje
+  if (miBT.available()) {    // si hay informacion disponible desde modulo
+    databt = miBT.read();   // almacena en databt el caracter recibido desde modulo
+    Serial.println(usSpeed);
+    Serial.println(databt);
 
+    String mensaje = "Botsura   conectado"; // Mensaje a enviar
+    miBT.println(mensaje); // Envía el mensaje por Bluetooth
 
-        if (databt == 0) {
-          bucle_activado = false;
-          Stop();
-          goLucesOff();
-
-        }
-        else if (databt == 1) {
-          bucle_activado = false;
-          Forward();
-          goLucesAdelante();
-        }
-        else if (databt == 2) {
-          bucle_activado = false;
-          Reverse();
-          goLucesReversa();
-        }
-        else if (databt == 3) {
-          bucle_activado = false;
-          Left();
-          goLucesIzquierda();
-        }
-        else if (databt == 4) {
-          bucle_activado = false;
-          Right();
-          goLucesDerecha();
-        }
-        else if (databt == 5) {
-          bucle_activado = false;
-          derForward();
-        }
-        else if (databt == 6) {
-          bucle_activado = false;
-          derReverse();
-        }
-        else if (databt == 7) {
-          bucle_activado = false;
-          izqForward();
-        }
-        else if (databt == 8) {
-          bucle_activado = false;
-          izqReverse();
-        }
-        else if (databt == 9) {
-          bucle_activado = false;
-          danceDance();
-        }
-        else if (databt == 15) {
-          bucle_activado = false;
-          goLuces();
-        }
-        else if (databt == 14) {
-          bucle_activado = false;
-          goLucesOff();
-        }
-        else if (databt == 15) {
-          bucle_activado = false;
-          led_blink();
-        }
-        else if (databt == 16) {
-          bucle_activado = false;
-          goLucesColor();
-        }
-        else if (databt == 17) {
-          bucle_activado = false;
-          goLucesOffColor();
-        }
-        else if (databt == 10) {
-          bucle_activado = false;
-          digitalWrite(LAZER, HIGH);
-        }
-        else if (databt == 255) {
-          bucle_activado = false;
-          setSpeed(255);
-        }
-        else if (databt == 160) {
-          bucle_activado = false;
-          setSpeed(160);
-        }
-        else if (databt == 90) {
-          bucle_activado = false;
-          setSpeed(90);
-        }
-        else {
-          bucle_activado = false;
-          Stop();
-          goLucesOff();
-        }
-      }
-      bucle_activado = true;
+    if (databt == 0) {
+      Stop();  goLucesOff();
     }
+    else if (databt == 1) {
+      Forward();
+      goLucesAdelante();
+    }
+    else if (databt == 2) {
+      Reverse();
+      goLucesReversa();
+    }
+    else if (databt == 3) {
+      Left();
+      goLucesIzquierda();
+    }
+    else if (databt == 4) {
+      Right();
+      goLucesDerecha();
+    }
+    else if (databt == 5) {
+      derForward();
+    }
+    else if (databt == 6) {
+      derReverse();
+    }
+    else if (databt == 7) {
+      izqForward();
+    }
+    else if (databt == 8) {
+      izqReverse();
+    }
+    else if (databt == 9) {
+      danceDance();
+    }
+    else if (databt == 15) {
+      goLuces();
+    }
+    else if (databt == 14) {
+      goLucesOff();
+    }
+    else if (databt == 15) {
+      led_blink();
+    }
+    else if (databt == 16) {
+      goLucesColor();
+    }
+    else if (databt == 17) {
+      goLucesOffColor();
+    }
+    else if (databt == 10) {
+      digitalWrite(LAZER, HIGH);
+    }
+    else if (databt == 255) {
+      setSpeed(255);
+    }
+    else if (databt == 160) {
+      setSpeed(160);
+    }
+    else if (databt == 90) {
+      setSpeed(90);
+    }
+    else {
+      Stop();
+      goLucesOff();
+    }
+      delay(10); // Espera un segundo antes de enviar el siguiente mensaje
+
   }
-
-
 }
 
 int setSpeed(int speed) {
